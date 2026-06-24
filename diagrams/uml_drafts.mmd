@@ -1,0 +1,31 @@
+classDiagram
+    class Task {
+        - title: str
+        - duration_minutes: int
+        - priority: str (low, medium, high)
+        + get_priority_value(): int
+    }
+
+    class Pet {
+        - name: str
+        - species: str
+        + get_info(): str
+    }
+
+    class Owner {
+        - name: str
+        - available_minutes_per_day: int
+        + get_available_time(): int
+    }
+
+    class Scheduler {
+        + generate_schedule(owner, pet, tasks): list[Task]
+        + sort_by_priority(tasks): list[Task]
+        + filter_by_time(tasks, available_time): list[Task]
+    }
+
+    Owner "1" --> "*" Pet : owns
+    Pet "1" --> "*" Task : has
+    Scheduler --> Owner : uses
+    Scheduler --> Pet : uses
+    Scheduler --> Task : schedules

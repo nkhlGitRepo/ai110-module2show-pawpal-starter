@@ -7,6 +7,18 @@
 - Briefly describe your initial UML design.
 - What classes did you include, and what responsibilities did you assign to each?
 
+Three core actions that a user should be able to perform:
+1. Add a task - in order to track pet care tasks users have to be able to add tasks.
+2. Generate a plan - This is one of the basic functionalities, producing a daily plan and explaining why it chose that plan
+3. View the Plan - After generating the plan, the user should be able to view what they generated
+
+Classes Created + responsibilities:
+1. Task: This class represents individual pet care tasks like walking and feeding and has properties like name, duration, and priority.
+2. Pet: This class represents the pet being taken care of, and contains name, species, and other info relevant to tasks.
+3. Owner: This class represents a person with certain constraints such as their name, available time per day, and preferences.
+4. Scheduler: This class takes the owner, pet, and tasks and creates an optimized daily plan.
+
+
 **b. Design changes**
 
 - Did your design change during implementation?
