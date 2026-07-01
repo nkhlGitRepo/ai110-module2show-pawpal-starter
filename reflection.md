@@ -24,6 +24,8 @@ Classes Created + responsibilities:
 - Did your design change during implementation?
 - If yes, describe at least one change and why you made it.
 
+Yes, my design did change.  I observed that the dependencies the AI created were very simplistic and did not account for every relationship, so I asked for further suggestions.  The AI recommended making it so Pets have Tasks, so each task is tailored to a specific pet, which was a design choice I chose to implement.  It also suggested adding an extra Schedule/Plan class, which I ignored for now.
+
 ---
 
 ## 2. Scheduling Logic and Tradeoffs

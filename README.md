@@ -54,6 +54,28 @@ Paste a sample of your app's CLI or Streamlit output here so a reader can see wh
 #   ...
 ```
 
+```
+==================================================
+TODAY'S SCHEDULE FOR Jordan
+==================================================
+
+Biscuit:
+  Scheduled 3/3 tasks. Total: 60 min. 
+    - Morning walk (30 min)
+    - Feeding (10 min)
+    - Playtime (20 min)
+
+Whiskers:
+  Scheduled 3/3 tasks. Total: 30 min. 
+    - Feeding (5 min)
+    - Litter box (10 min)
+    - Play session (15 min)
+
+==================================================
+```
+
+
+
 ## 🧪 Testing PawPal+
 
 ```bash
