@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from typing import List
+from datetime import datetime, timedelta
 
 
 @dataclass
@@ -7,14 +8,46 @@ class Task:
     title: str
     duration_minutes: int
     priority: str
+    scheduled_time: str = None
+    recurrence: str = "once"
+    due_date: str = None
     is_completed: bool = False
 
     def __post_init__(self):
-        """Validate task priority and duration on creation."""
+        """Validate task priority, duration, and due_date on creation."""
         if self.priority not in ["low", "medium", "high"]:
             raise ValueError(f"Priority must be low, medium, or high. Got: {self.priority}")
         if self.duration_minutes <= 0:
             raise ValueError(f"Duration must be positive. Got: {self.duration_minutes}")
+        if self.recurrence not in ["once", "daily", "weekly"]:
+            raise ValueError(f"Recurrence must be once, daily, or weekly. Got: {self.recurrence}")
+        if self.recurrence != "once" and not self.due_date:
+            raise ValueError("Recurring tasks must have a due_date (YYYY-MM-DD format).")
+        if self.due_date:
+            try:
+                datetime.strptime(self.due_date, "%Y-%m-%d")
+            except ValueError:
+                raise ValueError(f"due_date must be in YYYY-MM-DD format. Got: {self.due_date}")
+
+    def __eq__(self, other):
+        """Compare tasks: for recurring tasks include due_date, for one-time ignore it."""
+        if not isinstance(other, Task):
+            return False
+        base_equal = (self.title == other.title and
+                      self.duration_minutes == other.duration_minutes and
+                      self.priority == other.priority and
+                      self.recurrence == other.recurrence)
+
+        # For recurring tasks, due_date must also match (to distinguish occurrences)
+        if self.recurrence != "once":
+            return base_equal and self.due_date == other.due_date
+        return base_equal
+
+    def __hash__(self):
+        """Hash based on content, including due_date for recurring tasks."""
+        if self.recurrence != "once":
+            return hash((self.title, self.duration_minutes, self.priority, self.recurrence, self.due_date))
+        return hash((self.title, self.duration_minutes, self.priority, self.recurrence))
 
     def get_priority_value(self) -> int:
         """Return numeric value of task priority for sorting."""
@@ -24,6 +57,31 @@ class Task:
     def mark_complete(self) -> None:
         """Mark the task as completed."""
         self.is_completed = True
+
+    def create_next_occurrence(self) -> "Task":
+        """Create next occurrence with updated due_date for daily/weekly tasks."""
+        if self.recurrence == "once":
+            return None
+
+        # Calculate next due date
+        next_due_date = None
+        if self.due_date:
+            current_date = datetime.strptime(self.due_date, "%Y-%m-%d").date()
+            if self.recurrence == "daily":
+                next_date = current_date + timedelta(days=1)
+            elif self.recurrence == "weekly":
+                next_date = current_date + timedelta(days=7)
+            next_due_date = next_date.strftime("%Y-%m-%d")
+
+        return Task(
+            title=self.title,
+            duration_minutes=self.duration_minutes,
+            priority=self.priority,
+            scheduled_time=self.scheduled_time,
+            recurrence=self.recurrence,
+            due_date=next_due_date,
+            is_completed=False,
+        )
 
 
 @dataclass
@@ -53,6 +111,19 @@ class Pet:
         """Remove a task from the pet if it exists."""
         if task in self.tasks:
             self.tasks.remove(task)
+
+    def mark_task_complete(self, task: Task) -> None:
+        """Mark a task complete and create next occurrence if recurring."""
+        if task not in self.tasks:
+            raise ValueError(f"Task '{task.title}' not found in {self.name}'s tasks.")
+
+        task.mark_complete()
+
+        # Create next occurrence if task is recurring
+        if task.recurrence in ["daily", "weekly"]:
+            next_task = task.create_next_occurrence()
+            if next_task:
+                self.add_task(next_task)
 
 
 @dataclass
@@ -112,6 +183,11 @@ class Scheduler:
         return sorted(tasks, key=lambda task: task.get_priority_value(), reverse=True)
 
     @staticmethod
+    def _sort_by_time(tasks: List[Task]) -> List[Task]:
+        """Sort tasks by scheduled time in ascending order (earliest first)."""
+        return sorted(tasks, key=lambda task: task.scheduled_time or "23:59")
+
+    @staticmethod
     def _filter_by_time(tasks: List[Task], owner: Owner) -> List[Task]:
         """Filter tasks to fit within owner's available time using a greedy algorithm."""
         available_time = owner.get_available_time()
@@ -124,3 +200,45 @@ class Scheduler:
                 total_time += task.duration_minutes
 
         return filtered_tasks
+
+    @staticmethod
+    def _filter_by_status(tasks: List[Task], is_completed: bool) -> List[Task]:
+        """Filter tasks by completion status (True for completed, False for pending)."""
+        return [task for task in tasks if task.is_completed == is_completed]
+
+    @staticmethod
+    def _filter_by_pet(owner: Owner, pet_name: str) -> List[Task]:
+        """Filter tasks by pet name, returning tasks for the specified pet."""
+        for pet in owner.pets:
+            if pet.name == pet_name:
+                return pet.tasks
+        return []
+
+    @staticmethod
+    def detect_conflicts(owner: Owner) -> List[str]:
+        """Detect scheduling conflicts across all pets and return warning messages."""
+        conflicts = []
+
+        # Build a map of scheduled_time -> list of (pet, task) tuples
+        time_slots = {}
+        for pet in owner.pets:
+            for task in pet.tasks:
+                if task.scheduled_time and not task.is_completed:
+                    time_key = task.scheduled_time
+                    if time_key not in time_slots:
+                        time_slots[time_key] = []
+                    time_slots[time_key].append((pet, task))
+
+        # Check for conflicts at each time slot
+        for time_key, items in time_slots.items():
+            if len(items) > 1:
+                pet_names = [pet.name for pet, _ in items]
+                task_titles = [task.title for _, task in items]
+                conflict_msg = (
+                    f"⚠️  CONFLICT at {time_key}: "
+                    f"{', '.join(pet_names)} both scheduled for "
+                    f"{', '.join(task_titles)}"
+                )
+                conflicts.append(conflict_msg)
+
+        return conflicts

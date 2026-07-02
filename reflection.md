@@ -35,10 +35,14 @@ Yes, my design did change.  I observed that the dependencies the AI created were
 - What constraints does your scheduler consider (for example: time, priority, preferences)?
 - How did you decide which constraints mattered most?
 
+The scheduler considers time, priority, recurrence, completion status, and pet/owner constraints.  When deciding which constraints to use, I thought of which ones would be absolutely necessary for the app to have minimum basic functionality.  Things like prioritizing certain tasks or making sure the same task is not being performed multiple times are absolutely essential for the app to have value to a user.  I had the AI assistant confirm this way of thinking.
+
 **b. Tradeoffs**
 
 - Describe one tradeoff your scheduler makes.
 - Why is that tradeoff reasonable for this scenario?
+
+One tradeoff is that the conflict detection only checks if the tasks have the exact same scheduled time, for example that they are both at 9:00, while ignoring task durations.  This tradeoff is reasonable because it helps with speed and simplicity.  Detecting overlapping durations would add far more time complexity and even without it, obvious conflicts are still caught.
 
 ---
 
@@ -80,6 +84,11 @@ Yes, my design did change.  I observed that the dependencies the AI created were
 
 - If you had another iteration, what would you improve or redesign?
 
+One thing I would consider adding would be calculating actual time ranges for tasks and checking for overlaps, as this would lead to a massive improvement in the apps basic function of scheduling tasks.
+
+
 **c. Key takeaway**
 
 - What is one important thing you learned about designing systems or working with AI on this project?
+
+AI often adds a lot of complexity, so asking it to constantly explain what it is doing and questioning its reasoning is necessary to ensure the code remains both readable and logically sound.  Often times, questioning the AI on its implementation will lead it to find flaws in its own conclusions and fix them premptively.
