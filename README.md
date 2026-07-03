@@ -133,10 +133,79 @@ I would give my confidence level 4 out of 5 stars.  I think that I covered all t
 
 Describe your app in numbered steps so a reader can follow along without watching a video:
 
-1. <!-- Describe this step -->
-2. <!-- Describe this step -->
-3. <!-- Describe this step -->
-4. <!-- Describe this step -->
-5. <!-- Add more steps as needed -->
+1. Open PawPal+ and see the default owner (Jordan) with 480 minutes available per day.
+2. Update the owner name and available time, then click "Update Owner".
+3. Add a pet by entering its name, selecting species (dog/cat/other), and clicking "Add Pet".
+4. Add a second pet to see how the app handles multiple pets.
+5. Select a pet from the dropdown in the Task Management section.
+6. Create a task with a title, duration (minutes), priority, scheduled time (HH:MM), and recurrence type.
+7. For recurring tasks, set a due date in YYYY-MM-DD format.
+8. View all tasks in a table with filtering options (show/hide pending or completed).
+9. Sort tasks by priority, scheduled time, or duration.
+10. Switch to another pet and add different tasks for that pet.
+11. Select a pending task and click "Mark Complete" to change its status.
+12. Observe that daily/weekly tasks automatically create a new occurrence for the next day/week.
+13. Click "Generate Daily Schedule" to create an optimized schedule for all pets.
+14. Review any conflict warnings if tasks overlap at the same scheduled time.
+15. See each pet's schedule with an explanation of how many tasks fit within available time.
+16. Notice tasks are sorted by priority (high to low) and filtered to respect time constraints.
+17. Try resetting all pets to start over with a fresh schedule.
+
+
+Sample CLI Output from running main.py:
+```
+==================================================
+SORT BY TIME (out-of-order → chronological)
+==================================================
+
+Biscuit:
+  08:00 — Feeding (10 min)
+  14:00 — Playtime (20 min)
+  16:00 — Grooming (45 min)
+  18:00 — Evening walk (30 min)
+
+Whiskers:
+  08:30 — Feeding (5 min)
+  12:00 — Litter box (10 min)
+  15:00 — Afternoon nap (20 min)
+
+==================================================
+FILTER BY STATUS
+==================================================
+
+Biscuit:
+  Pending (3): Evening walk, Playtime, Grooming
+  Completed (1): Feeding
+
+Whiskers:
+  Pending (2): Afternoon nap, Litter box
+  Completed (1): Feeding
+
+==================================================
+RECURRING TASKS TEST
+==================================================
+
+Initial tasks (3):
+  1. Morning walk [daily]
+  2. Feeding [daily]
+  3. Grooming [once]
+
+--- Marking 'Morning walk' as complete ---
+After marking complete (4 total):
+  1. ✓ Morning walk [daily]
+  2. ○ Feeding [daily]
+  3. ○ Grooming [once]
+  4. ○ Morning walk [daily]
+
+==================================================
+CONFLICT DETECTION TEST
+==================================================
+
+Conflicts detected: 2
+  ⚠️  CONFLICT at 09:00: Rex, Luna both scheduled for Walk, Feeding
+  ⚠️  CONFLICT at 14:00: Rex both scheduled for Playtime, Training
+
+==================================================
+```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->

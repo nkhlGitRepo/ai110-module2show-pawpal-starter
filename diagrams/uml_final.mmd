@@ -1,0 +1,58 @@
+classDiagram
+    %% PawPal+ System Design - Final Implementation
+    %% Shows all classes, attributes, methods, and relationships
+
+    class Task {
+        +str title
+        +int duration_minutes
+        +str priority
+        +str scheduled_time
+        +str recurrence
+        +str due_date
+        +bool is_completed
+        +__post_init__() void
+        +__eq__(other) bool
+        +__hash__() int
+        +get_priority_value() int
+        +mark_complete() void
+        +create_next_occurrence() Task
+    }
+
+    class Pet {
+        +str name
+        +str species
+        +List~Task~ tasks
+        +__post_init__() void
+        +get_info() str
+        +add_task(task) void
+        +remove_task(task) void
+        +mark_task_complete(task) void
+    }
+
+    class Owner {
+        +str name
+        +int available_minutes_per_day
+        +List~Pet~ pets
+        +__post_init__() void
+        +get_available_time() int
+        +add_pet(pet) void
+        +remove_pet(pet) void
+    }
+
+    class Scheduler {
+        +List~Task~ scheduled_tasks
+        +int total_duration_minutes
+        +str explanation
+        +generate(owner, pet)$ Scheduler
+        +_sort_by_priority(tasks)$ List~Task~
+        +_sort_by_time(tasks)$ List~Task~
+        +_filter_by_time(tasks, owner)$ List~Task~
+        +_filter_by_status(tasks, is_completed)$ List~Task~
+        +_filter_by_pet(owner, pet_name)$ List~Task~
+        +detect_conflicts(owner)$ List~str~
+    }
+
+    Owner "1" --> "*" Pet : has
+    Pet "1" --> "*" Task : contains
+    Scheduler --> Owner : operates on
+    Scheduler --> Pet : operates on
