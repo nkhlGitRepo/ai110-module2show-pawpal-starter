@@ -80,17 +80,43 @@ Whiskers:
 
 ```bash
 # Run the full test suite:
-pytest
+python -m pytest
+
+# Run with verbose output:
+python -m pytest -v
 
 # Run with coverage:
-pytest --cov
+python -m pytest --cov
 ```
+
+All Tests + What they cover:
+
+There are 24 total tests covering:
+- Sorting Correctness — Tasks sorted chronologically by time and priority
+- Recurrence Logic — Daily/weekly tasks auto-create next occurrences
+- Conflict Detection — Multiple tasks at same time are flagged
+- Filtering — Tasks filtered by completion status and pet name
+- Validation — Invalid inputs (priority, duration, dates) are rejected
+- Duplicate Prevention — Duplicate tasks are prevented appropriately
 
 Sample test output:
 
 ```
-# Paste your pytest output here
+============================= test session starts ==============================
+collected 24 items
+
+tests/test_pawpal.py::test_task_completion PASSED                        [  4%]
+tests/test_pawpal.py::test_sort_by_time_chronological_order PASSED       [ 12%]
+tests/test_pawpal.py::test_recurring_daily_task_creates_next_occurrence PASSED [ 25%]
+tests/test_pawpal.py::test_detect_conflicts_same_time PASSED             [ 37%]
+tests/test_pawpal.py::test_filter_by_status_pending PASSED               [ 54%]
+tests/test_pawpal.py::test_invalid_priority_raises_error PASSED          [ 66%]
+tests/test_pawpal.py::test_duplicate_one_time_task_rejected PASSED       [ 95%]
+
+============================== 24 passed in 0.03s ===============================
 ```
+
+I would give my confidence level 4 out of 5 stars.  I think that I covered all the core logic and basic functionality, but given more time I may have been able to think of more edge cases that I did not account for here.  If I felt I had exhausted every possible break point, that would make my confidence go up to a 5.
 
 ## 📐 Smarter Scheduling
 

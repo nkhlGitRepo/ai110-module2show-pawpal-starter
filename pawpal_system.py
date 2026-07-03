@@ -221,18 +221,23 @@ class Scheduler:
 
         # Build a map of scheduled_time -> list of (pet, task) tuples
         time_slots = {}
+        unscheduled = []
+
         for pet in owner.pets:
             for task in pet.tasks:
-                if task.scheduled_time and not task.is_completed:
-                    time_key = task.scheduled_time
-                    if time_key not in time_slots:
-                        time_slots[time_key] = []
-                    time_slots[time_key].append((pet, task))
+                if not task.is_completed:
+                    if task.scheduled_time:
+                        time_key = task.scheduled_time
+                        if time_key not in time_slots:
+                            time_slots[time_key] = []
+                        time_slots[time_key].append((pet, task))
+                    else:
+                        unscheduled.append((pet, task))
 
         # Check for conflicts at each time slot
         for time_key, items in time_slots.items():
             if len(items) > 1:
-                pet_names = [pet.name for pet, _ in items]
+                pet_names = list(set([pet.name for pet, _ in items]))
                 task_titles = [task.title for _, task in items]
                 conflict_msg = (
                     f"⚠️  CONFLICT at {time_key}: "
@@ -240,5 +245,15 @@ class Scheduler:
                     f"{', '.join(task_titles)}"
                 )
                 conflicts.append(conflict_msg)
+
+        # Warn about multiple unscheduled tasks
+        if len(unscheduled) > 1:
+            pet_names = list(set([pet.name for pet, _ in unscheduled]))
+            task_titles = [task.title for _, task in unscheduled]
+            conflict_msg = (
+                f"⚠️  WARNING: {len(unscheduled)} tasks have no scheduled time: "
+                f"{', '.join(task_titles)} — owner can only do one at a time"
+            )
+            conflicts.append(conflict_msg)
 
         return conflicts
