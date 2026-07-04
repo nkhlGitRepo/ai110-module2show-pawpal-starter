@@ -209,3 +209,36 @@ Conflicts detected: 2
 ```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or link to a demo video here -->
+
+## Enhanced Scheduling Output
+
+```
+============================================================
+ENHANCED SCHEDULING: PRIORITY THEN TIME SORTING
+============================================================
+
+Generated schedule for Buddy:
+Scheduled 5/5 tasks. Total: 135 min. 
+
+  1. 08:00 — Morning walk (30 min) [high]
+  2. 12:00 — Feeding (10 min) [high]
+  3. 14:00 — Playtime (20 min) [medium]
+  4. 18:00 — Evening walk (30 min) [medium]
+  5. 16:00 — Grooming (45 min) [low]
+
+============================================================
+SCHEDULING WITH MIXED TIME FORMATS
+============================================================
+
+Generated schedule for Whiskers:
+(Note: Times entered as '5:00', '7:00', '9:30' sort correctly)
+
+  1.   5:00 — Feeding (5 min) [high]
+  2.   7:00 — Grooming (10 min) [high]
+  3.  09:30 — Playtime (15 min) [high]
+  4.  15:00 — Nap supervision (20 min) [medium]
+
+============================================================
+```
+
+This is the CLI output that demonstrates the enhanced scheduling logic for Challenge 3: Advanced Priority Scheduling.

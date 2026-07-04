@@ -161,8 +161,8 @@ class Scheduler:
 
     @classmethod
     def generate(cls, owner: Owner, pet: Pet) -> "Scheduler":
-        """Generate an optimized schedule by sorting tasks by priority and filtering by time constraints."""
-        sorted_tasks = cls._sort_by_priority(pet.tasks)
+        """Generate an optimized schedule by sorting tasks by priority then time, and filtering by time constraints."""
+        sorted_tasks = cls._sort_by_priority_then_time(pet.tasks)
         filtered_tasks = cls._filter_by_time(sorted_tasks, owner)
         total_duration = sum(task.duration_minutes for task in filtered_tasks)
 
@@ -186,6 +186,20 @@ class Scheduler:
     def _sort_by_time(tasks: List[Task]) -> List[Task]:
         """Sort tasks by scheduled time in ascending order (earliest first)."""
         return sorted(tasks, key=lambda task: task.scheduled_time or "23:59")
+
+    @staticmethod
+    def _sort_by_priority_then_time(tasks: List[Task]) -> List[Task]:
+        """Sort tasks by priority first (high to low), then by scheduled time (earliest first)."""
+        def time_to_minutes(time_str):
+            if not time_str:
+                return 1440
+            try:
+                hours, minutes = map(int, time_str.split(":"))
+                return hours * 60 + minutes
+            except (ValueError, AttributeError):
+                return 1440
+
+        return sorted(tasks, key=lambda task: (-task.get_priority_value(), time_to_minutes(task.scheduled_time)))
 
     @staticmethod
     def _filter_by_time(tasks: List[Task], owner: Owner) -> List[Task]:
