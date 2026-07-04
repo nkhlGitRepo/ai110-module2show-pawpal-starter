@@ -5,6 +5,21 @@ from datetime import datetime
 st.set_page_config(page_title="PawPal+", page_icon="🐾", layout="wide")
 st.title("🐾 PawPal+ — Pet Care Scheduler")
 
+# Helper functions for UI enhancements
+def get_species_emoji(species):
+    """Return emoji for pet species."""
+    emoji_map = {"dog": "🐕", "cat": "🐱", "other": "🐾"}
+    return emoji_map.get(species.lower(), "🐾")
+
+def get_priority_emoji(priority):
+    """Return emoji for task priority."""
+    emoji_map = {"high": "🔴", "medium": "🟡", "low": "🟢"}
+    return emoji_map.get(priority.lower(), "⚪")
+
+def get_status_badge(is_completed):
+    """Return status badge with emoji."""
+    return "✅ Done" if is_completed else "⏳ Pending"
+
 # Initialize session state
 if "owner" not in st.session_state:
     st.session_state.owner = Owner(name="Jordan", available_minutes_per_day=480)
@@ -40,7 +55,7 @@ col1, col2, col3 = st.columns(3)
 with col1:
     pet_name = st.text_input("Pet name:", value="Mochi", key="pet_name")
 with col2:
-    species = st.selectbox("Species:", ["dog", "cat", "other"])
+    species = st.selectbox("Species:", ["dog", "cat", "other"], format_func=lambda s: f"{get_species_emoji(s)} {s.capitalize()}")
 with col3:
     if st.button("Add Pet"):
         try:
@@ -57,7 +72,7 @@ if st.session_state.pets:
     with col1:
         st.write("**Pets:**")
         for i, pet in enumerate(st.session_state.pets):
-            st.caption(f"{i+1}. {pet.get_info()}")
+            st.caption(f"{i+1}. {get_species_emoji(pet.species)} {pet.get_info()}")
     with col2:
         if st.button("Reset Pets"):
             st.session_state.pets = []
@@ -84,7 +99,7 @@ if st.session_state.pets:
         with col2:
             duration = st.number_input("Duration (min):", min_value=1, max_value=240, value=30)
         with col3:
-            priority = st.selectbox("Priority:", ["low", "medium", "high"])
+            priority = st.selectbox("Priority:", ["low", "medium", "high"], format_func=lambda p: f"{get_priority_emoji(p)} {p.capitalize()}")
 
         col4, col5, col6 = st.columns(3)
         with col4:
@@ -148,14 +163,15 @@ if st.session_state.pets:
         # Display tasks
         task_data = []
         for t in sorted_tasks:
-            status = "✓ Done" if t.is_completed else "⏳ Pending"
-            recur_info = f"[{t.recurrence}]" if t.recurrence != "once" else ""
+            status = get_status_badge(t.is_completed)
+            priority_badge = f"{get_priority_emoji(t.priority)} {t.priority.upper()}"
+            recur_info = f"🔄 {t.recurrence}" if t.recurrence != "once" else ""
             task_data.append({
                 "Status": status,
                 "Title": t.title,
                 "Time": t.scheduled_time or "—",
                 "Duration": f"{t.duration_minutes} min",
-                "Priority": t.priority,
+                "Priority": priority_badge,
                 "Recurrence": recur_info,
             })
 
@@ -204,25 +220,26 @@ if st.button("🚀 Generate Daily Schedule", use_container_width=True):
                 schedule = Scheduler.generate(st.session_state.owner, pet)
 
                 with st.container(border=True):
-                    st.subheader(f"🐾 {pet.name}'s Schedule")
+                    st.subheader(f"{get_species_emoji(pet.species)} {pet.name}'s Schedule")
                     st.info(schedule.explanation)
 
                     if schedule.scheduled_tasks:
                         # Display scheduled tasks
                         schedule_data = []
                         for i, task in enumerate(schedule.scheduled_tasks, 1):
+                            priority_badge = f"{get_priority_emoji(task.priority)} {task.priority.upper()}"
                             schedule_data.append({
                                 "Order": i,
-                                "Time": task.scheduled_time or "—",
+                                "Time": f"🕐 {task.scheduled_time}" if task.scheduled_time else "—",
                                 "Task": task.title,
-                                "Duration": f"{task.duration_minutes} min",
-                                "Priority": task.priority.upper(),
+                                "Duration": f"⏱️ {task.duration_minutes} min",
+                                "Priority": priority_badge,
                             })
                         st.table(schedule_data)
                     else:
                         st.warning("No tasks fit in the available time.")
             else:
-                st.write(f"*{pet.name}: No tasks to schedule*")
+                st.write(f"*{get_species_emoji(pet.species)} {pet.name}: No tasks to schedule*")
 
 st.divider()
 

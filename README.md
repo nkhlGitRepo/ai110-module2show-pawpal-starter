@@ -242,3 +242,29 @@ Generated schedule for Whiskers:
 ```
 
 This is the CLI output that demonstrates the enhanced scheduling logic for Challenge 3: Advanced Priority Scheduling.
+
+## UI Formatting Features
+
+For Challenge 4: Professional UI and Formatting:
+
+Features Added
+
+| Feature | Description | Implementation |
+|---------|-------------|-----------------|
+| Species Emojis | Visual indicators for pet types (🐕 dog, 🐱 cat, 🐾 other) | `get_species_emoji()` function |
+| Priority Badges | Color-coded priority indicators (🔴 high, 🟡 medium, 🟢 low) | `get_priority_emoji()` function |
+| Status Indicators | Task completion status with emoji (✅ Done, ⏳ Pending) | `get_status_badge()` function |
+| Time Icons | Clock emoji (🕐) for scheduled times | Inline emoji in task tables |
+| Duration Icons | Timer emoji (⏱️) for task durations | Inline emoji in schedule displays |
+| Recurrence Badges | Circular arrow emoji (🔄) for recurring tasks | Inline emoji for recurrence info |
+
+Libraries and Techniques Used
+
+Streamlit built-in features were leveraged for all formatting:
+- `st.selectbox()` with `format_func` parameter to add emojis to dropdown options
+- Python f-strings for clean, readable emoji integration
+- Three reusable helper functions in `app.py` for consistent emoji application:
+  - `get_species_emoji(species)` — Returns emoji based on pet species
+  - `get_priority_emoji(priority)` — Returns emoji based on task priority
+  - `get_status_badge(is_completed)` — Returns formatted status string with emoji
+- Python dictionaries to map values to their corresponding emojis
