@@ -128,3 +128,39 @@ if not conflicts:
     print("  ✓ No conflicts found!")
 
 print("\n" + "=" * 50)
+
+# Test 6: Suggest optimal time slots
+print("\nTIME SLOT SUGGESTION TEST")
+print("=" * 50)
+
+owner_slots = Owner(name="Sam", available_minutes_per_day=600)
+dog_slots = Pet(name="Max", species="Labrador")
+cat_slots = Pet(name="Luna", species="Siamese")
+
+dog_slots.add_task(Task(title="Walk", duration_minutes=30, priority="high", scheduled_time="08:00"))
+dog_slots.add_task(Task(title="Feeding", duration_minutes=10, priority="high", scheduled_time="12:00"))
+cat_slots.add_task(Task(title="Feeding", duration_minutes=5, priority="high", scheduled_time="09:00"))
+cat_slots.add_task(Task(title="Playtime", duration_minutes=15, priority="medium", scheduled_time="17:00"))
+
+owner_slots.add_pet(dog_slots)
+owner_slots.add_pet(cat_slots)
+
+print("\nCurrent schedule:")
+print(f"  Max: 08:00 (Walk), 12:00 (Feeding)")
+print(f"  Luna: 09:00 (Feeding), 17:00 (Playtime)")
+
+new_task_high = Task(title="Training", duration_minutes=20, priority="high")
+suggestions = Scheduler.suggest_time_slots(owner_slots, dog_slots, new_task_high)
+
+print(f"\nSuggested times for Max's 'Training' (high priority):")
+for slot, note in suggestions:
+    print(f"  {note}")
+
+new_task_medium = Task(title="Nap time", duration_minutes=30, priority="medium")
+suggestions_medium = Scheduler.suggest_time_slots(owner_slots, cat_slots, new_task_medium)
+
+print(f"\nSuggested times for Luna's 'Nap time' (medium priority):")
+for slot, note in suggestions_medium:
+    print(f"  {note}")
+
+print("\n" + "=" * 50)

@@ -257,3 +257,34 @@ class Scheduler:
             conflicts.append(conflict_msg)
 
         return conflicts
+
+    @staticmethod
+    def suggest_time_slots(owner: Owner, pet: Pet, task: Task, num_suggestions: int = 3) -> List[tuple]:
+        """Suggest optimal time slots for an unscheduled task based on conflicts and priority."""
+        all_slots = [f"{hour:02d}:00" for hour in range(6, 23)]
+
+        scheduled_times = set(t.scheduled_time for t in pet.tasks if t.scheduled_time and not t.is_completed)
+        conflicting_times = set()
+        for other_pet in owner.pets:
+            if other_pet.name != pet.name:
+                for t in other_pet.tasks:
+                    if t.scheduled_time and not t.is_completed:
+                        conflicting_times.add(t.scheduled_time)
+
+        scored_slots = []
+        for slot in all_slots:
+            if slot not in scheduled_times:
+                has_conflict = slot in conflicting_times
+                hour = int(slot.split(":")[0])
+                early_bonus = max(0, 22 - hour) if task.priority == "high" else 0
+                conflict_penalty = 10 if has_conflict else 0
+                score = early_bonus - conflict_penalty
+                scored_slots.append((slot, score, has_conflict))
+
+        scored_slots.sort(key=lambda x: x[1], reverse=True)
+        suggestions = []
+        for slot, score, has_conflict in scored_slots[:num_suggestions]:
+            note = "(⚠️ conflicts with another pet)" if has_conflict else "(no conflicts)"
+            suggestions.append((slot, f"{slot} {note}"))
+
+        return suggestions
